@@ -35,16 +35,19 @@ export const registerUser = createAsyncThunk(
       navigate("/login");
       return response.data.data;
     } catch (error) {
-      // 실패
-      // 1. 실패 토스트 메시지를 보여준다
+      // 백엔드에서 보낸 에러 메시지 추출
+      const errorMsg =
+        error.response && error.response.data && error.response.data.message
+          ? error.response.data.message
+          : "회원가입에 실패했습니다.";
+
       dispatch(
         showToastMessage({
-          message: "회원가입에 실패했습니다.",
+          message: errorMsg,
           status: "error",
         })
       );
-      // 2. 에러값을 저장한다
-      return rejectWithValue(error.error);
+      return rejectWithValue(errorMsg);
     }
   }
 );
