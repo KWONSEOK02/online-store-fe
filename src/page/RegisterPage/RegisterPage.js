@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
 import "./style/register.style.css";
 
-import { registerUser } from "../../features/user/userSlice";
+import { registerUser, clearErrors } from "../../features/user/userSlice"; // 회원가입-> 로그인-> 회원가입 페이지 이동 시 clearErrors로 이전 메세지 제거
 
 const RegisterPage = () => {
   const dispatch = useDispatch();
@@ -20,6 +20,11 @@ const RegisterPage = () => {
   const [passwordError, setPasswordError] = useState("");
   const [policyError, setPolicyError] = useState(false);
   const { registrationError } = useSelector((state) => state.user);
+
+  useEffect(() => { //회원가입 페이지 들어왔을 때 에러 초기화
+    dispatch(clearErrors());
+  }, []);
+  
 
   const register = (event) => {
     event.preventDefault();
