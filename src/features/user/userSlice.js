@@ -4,9 +4,16 @@ import { showToastMessage } from "../common/uiSlice";
 import api from "../../utils/api";
 import { initialCart } from "../cart/cartSlice";
 
-export const loginWithEmail = createAsyncThunk(
+export const loginWithEmail = createAsyncThunk( // 로그인 시 토큰 세션 스토리지에 저장
   "user/loginWithEmail",
-  async ({ email, password }, { rejectWithValue }) => {}
+  async ({ email, password }, { rejectWithValue }) => {
+    try{
+      const response = await api.post("/auth/login", {email, password});
+      return response.data; // response.data.user 도 가능
+    } catch(error){
+        return rejectWithValue(error.message); // error.message 백엔드의 오류 메시지 받아서 출력 
+    }
+  }
 );
 
 export const loginWithGoogle = createAsyncThunk(
@@ -14,7 +21,11 @@ export const loginWithGoogle = createAsyncThunk(
   async (token, { rejectWithValue }) => {}
 );
 
-export const logout = () => (dispatch) => {};
+export const logout = () => (dispatch) => {
+  sessionStorage.removeItem("token"); // 토큰 삭제
+  window.location.href = "/login"; // 로그인 페이지로 강제 이동 (새로고침 포함)
+};
+
 export const registerUser = createAsyncThunk(
   "user/registerUser",
   async (
@@ -52,10 +63,23 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-export const loginWithToken = createAsyncThunk(
+export const loginWithToken = createAsyncThunk( // 토큰 유지 시 로그인 상태 유지 
   "user/loginWithToken",
-  async (_, { rejectWithValue }) => {}
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+
+      api.defaults.headers["authorization"] = "Bearer " + token;
+      const response = await api.get("/auth/me"); // 사용자 정보 요청 (/auth/me)
+
+      return response.data.user; // 성공 시 사용자 정보 반환
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
 );
+
 
 const userSlice = createSlice({
   name: "user",
@@ -83,7 +107,20 @@ const userSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.registrationError = action.payload;
-      });
+      })
+      .addCase(loginWithEmail.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loginWithEmail.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.loginError = null;
+      })
+      .addCase(loginWithEmail.rejected, (state, action) => {
+        state.loading = false;
+        state.loginError = action.payload;
+      })
+      
   },
 });
 export const { clearErrors } = userSlice.actions;

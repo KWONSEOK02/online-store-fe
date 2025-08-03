@@ -20,10 +20,30 @@ const Login = () => {
     if (loginError) {
       dispatch(clearErrors());
     }
-  }, [navigate]);
-  const handleLoginWithEmail = (event) => {
+    if (user) {
+      navigate("/"); // user가 로그인되었으면 리디렉션
+    }
+  }, [user, navigate]);
+
+  const handleLoginWithEmail = async (event) => {
     event.preventDefault();
-    dispatch(loginWithEmail({ email, password }));
+
+    const result = await dispatch(loginWithEmail({ email, password }));
+  
+    if (loginWithEmail.fulfilled.match(result)) {
+      const { user, token } = result.payload; // user를 나중에 사용할 것인가?
+  
+      sessionStorage.setItem("token", token);
+  
+      // api 인스턴스가 별도로 정의되어 있다면 import 해야 함
+      import("../../utils/api").then(({ default: api }) => {
+        api.defaults.headers["authorization"] = "Bearer " + token;
+      });
+  
+    } else {
+      // 오류 메시지는 Redux store의 loginError를 통해 Alert로 표시됨
+      console.error("Login failed:", result.payload);
+    }
   };
 
   const handleGoogleLogin = async (googleData) => {
@@ -31,7 +51,7 @@ const Login = () => {
   };
 
   if (user) {
-    navigate("/");
+    navigate("/"); //  이미 로그인된 유저가 로그인 페이지에 접근하면 메인
   }
   return (
     <>
