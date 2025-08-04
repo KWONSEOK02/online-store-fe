@@ -1,0 +1,3 @@
+/api/*  https://online-store-be-b192c4bf224a.herokuapp.com/api/:splat 200
+/*    /index.html   200
+
