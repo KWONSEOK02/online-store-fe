@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { loginWithToken } from "./features/user/userSlice"; // 실제 위치 확인 필요
 
-function App() {
+function App() { //Redux 상태 복구용 액션(loginWithToken)을 App.js에서 디스패치
   const dispatch = useDispatch();
 
   useEffect(() => {

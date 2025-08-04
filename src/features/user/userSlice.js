@@ -67,13 +67,9 @@ export const loginWithToken = createAsyncThunk( // 토큰 유지 시 로그인 �
   "user/loginWithToken",
   async (_, { rejectWithValue }) => {
     try {
-      const token = sessionStorage.getItem("token");
-      if (!token) throw new Error("No token found");
+      const response = await api.get("/user/me"); // api.js에서 토큰 헤더에 세팅하고 있어서 가져오기만 하면된다.
 
-      api.defaults.headers["authorization"] = "Bearer " + token;
-      const response = await api.get("/auth/me"); // 사용자 정보 요청 (/auth/me)
-
-      return response.data.user; // 성공 시 사용자 정보 반환
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -120,6 +116,9 @@ const userSlice = createSlice({
         state.loading = false;
         state.loginError = action.payload;
       })
+      .addCase(loginWithToken.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+      });      
       
   },
 });
