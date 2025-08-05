@@ -22,7 +22,7 @@ const LandingPage = () => {
   return (
     <Container>
       <Row>
-        {productList.length > 0 ? (
+        {Array.isArray(productList) && productList.length > 0 ? ( //Array.isArray(productList)사용 이유 : 비동기 요청 전에 productList가 아직 undefined일 수 있음
           productList.map((item) => (
             <Col md={3} sm={12} key={item._id}>
               <ProductCard item={item} />
