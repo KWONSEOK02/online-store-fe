@@ -24,6 +24,7 @@ const AdminProductPage = () => {
   }); //검색 조건들을 저장하는 객체
 
   const [mode, setMode] = useState("new");
+  const [initialLoading, setInitialLoading] = useState(true); // 로딩 시작 상태
 
   const tableHeader = [
     "#",
@@ -37,11 +38,12 @@ const AdminProductPage = () => {
   ];
 
   //상품리스트 가져오기 (url쿼리 맞춰서)
-useEffect(() => {
-  console.log("searchQuery", searchQuery); 
-  dispatch(getProductList({...searchQuery}));
-}, [query]); 
-
+  useEffect(() => {
+    dispatch(getProductList({ ...searchQuery })).finally(() => {
+      setInitialLoading(false); // 로딩 완료 시 초기 로딩 종료
+    });
+  }, [query]);
+  
   useEffect(() => {
     //검색어나 페이지가 바뀌면 url바꿔주기 (검색어또는 페이지가 바뀜 => url 바꿔줌=> url쿼리 읽어옴=> 이 쿼리값 맞춰서  상품리스트 가져오기)
     if (searchQuery.name === "") {
@@ -102,6 +104,8 @@ useEffect(() => {
           data={productList}
           deleteItem={deleteItem}
           openEditForm={openEditForm}
+          searchKeyword={searchQuery.name}
+          initialLoading={initialLoading}
         />
         <ReactPaginate
           nextLabel="next >"
