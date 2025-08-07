@@ -20,7 +20,7 @@ const AdminProductPage = () => {
   const [showDialog, setShowDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState({
     page: query.get("page") || 1,
-    name: query.get("name") || "",
+    name: query.get("name") || "", // 초기 값
   }); //검색 조건들을 저장하는 객체
 
   const [mode, setMode] = useState("new");
@@ -38,11 +38,18 @@ const AdminProductPage = () => {
 
   //상품리스트 가져오기 (url쿼리 맞춰서)
 useEffect(() => {
-  dispatch(getProductList());
-}, []);
+  console.log("searchQuery", searchQuery); 
+  dispatch(getProductList({...searchQuery}));
+}, [query]); 
 
   useEffect(() => {
     //검색어나 페이지가 바뀌면 url바꿔주기 (검색어또는 페이지가 바뀜 => url 바꿔줌=> url쿼리 읽어옴=> 이 쿼리값 맞춰서  상품리스트 가져오기)
+    if (searchQuery.name === "") {
+      delete searchQuery.name;
+    }
+    const params = new URLSearchParams(searchQuery);  //URLSearchParams는 객체 형태의 파라미터를 URL 쿼리스트링 형식으로 변환
+    const query = params.toString();
+    navigate("?" + query);    
   }, [searchQuery]);
 
   const deleteItem = (id) => {
@@ -64,8 +71,13 @@ useEffect(() => {
 
   const handlePageClick = ({ selected }) => {
     //  쿼리에 페이지값 바꿔주기
+    const newPage = selected + 1; // ReactPaginate는 0부터 시작하므로 +1
+    setSearchQuery({ ...searchQuery, page: newPage });
   };
-
+  //searchbox에서 검색어를 읽어온다 => 엔터를 치면 => searchQuery 객체가 업데이트가 됨 
+  //=> searchQuery 객체 안에 아이템 기준으로 url을 새로 생성해서 호출 &name=스트레이트+팬츠
+ //=> url쿼리 읽어오기 => url쿼리 기준으로 BE에 검색조건과 함께 호출함
+  
   return (
     <div className="locate-center">
       <Container>
@@ -91,7 +103,7 @@ useEffect(() => {
           nextLabel="next >"
           onPageChange={handlePageClick}
           pageRangeDisplayed={5}
-          pageCount={100}
+          pageCount={totalPageNum}
           forcePage={searchQuery.page - 1}
           previousLabel="< previous"
           renderOnZeroPageCount={null}

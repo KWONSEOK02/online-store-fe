@@ -5,7 +5,8 @@ import { useSearchParams } from "react-router-dom";
 
 const SearchBox = ({ searchQuery, setSearchQuery, placeholder, field }) => {
   const [query] = useSearchParams();
-  const [keyword, setKeyword] = useState(query.get(field) || "");
+  const [keyword, setKeyword] = useState(query.get(field) || ""); 
+  //  URL 쿼리스트링에서 특정 검색 조건(field)을 읽어와서 keyword 상태로 저장
 
   const onCheckEnter = (event) => {
     if (event.key === "Enter") {
