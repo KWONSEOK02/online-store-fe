@@ -21,7 +21,7 @@ const InitialFormData = {
   price: 0,
 };
 
-const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
+const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
   const { error, success, selectedProduct } = useSelector(
     (state) => state.product
   );
@@ -33,7 +33,8 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   const [stockError, setStockError] = useState(false);
 
   useEffect(() => {
-    if (success) setShowDialog(false);
+      setShowDialog(false);
+      refreshList(); //리스트 새로고침
   }, [success]);
 
   useEffect(() => {
@@ -50,18 +51,17 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
         ]);
         setStock(sizeArray);
       } else {
-        setFormData({ ...InitialFormData });
-        setStock([]);
+        setFormData({ ...InitialFormData });   // 이미 여기서 초기화됨
+        setStock([]); // 이미 여기서 초기화함
       }
     }
   }, [showDialog]);
 
-  const handleClose = () => {
-    //모든걸 초기화시키고;
-    // 다이얼로그 닫아주기
+  const handleClose = () => { // 창 닫을 떄 위에서 초기화 하므로 초기화 할 필요 없다.
+    setShowDialog(false);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     // [["s", "3"],["m", "4"]] => {s:3, m:4}
     // 재고를 입력했는지 확인, 아니면 에러
@@ -74,7 +74,13 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
 
     if (mode === "new") {
       //새 상품 만들기
-      dispatch(createProduct({ ...formData, stock: totalStock }));
+      const result = await dispatch(createProduct({ ...formData, stock: totalStock }));
+
+      // ✅ 비동기 결과가 성공했는지 판별
+      if (createProduct.fulfilled.match(result)) {
+        refreshList();        // ✅ 리스트 새로고침
+        setShowDialog(false); // ✅ 모달 닫기
+      }
     } else {
       // 상품 수정하기
     }

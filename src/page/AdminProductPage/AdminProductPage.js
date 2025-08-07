@@ -69,6 +69,10 @@ useEffect(() => {
 
   };
 
+  const refreshList = () => {
+    setSearchQuery({ ...searchQuery, page: 1 }); //1페이지로 이동하면서 리스트 갱신
+  };  
+
   const handlePageClick = ({ selected }) => {
     //  쿼리에 페이지값 바꿔주기
     const newPage = selected + 1; // ReactPaginate는 0부터 시작하므로 +1
@@ -126,6 +130,7 @@ useEffect(() => {
         mode={mode}
         showDialog={showDialog}
         setShowDialog={setShowDialog}
+        refreshList={refreshList} // 상품 생성 성공 시 리스트를 갱신하기 위한 함수
       />
     </div>
   );

@@ -31,11 +31,13 @@ export const createProduct = createAsyncThunk(
   async (formData, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.post("/product", formData);
-      if (response.status !== 200) throw new Error(response.error);
+      //error로 받으면 "Product validation failed: sku:" 같은 불필요한 앞부분이 붙는 문제
+      //error -> message로 수정
+      if (response.status !== 200) throw new Error(response.message);  
       dispatch(showToastMessage({ message: "상품 생성 완료", status: "success" }));
       return response.data.data;
     } catch (error) {
-      return rejectWithValue(error.error || "상품 생성 실패");
+      return rejectWithValue( error.message || "상품 생성 실패"); // error.message로 백엔드에서 받음
     }
   }
 );
