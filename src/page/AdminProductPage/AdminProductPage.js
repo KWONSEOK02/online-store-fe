@@ -11,6 +11,7 @@ import {
   deleteProduct,
   setSelectedProduct,
 } from "../../features/product/productSlice";
+import { showToastMessage } from "../../features/common/uiSlice";
 
 const AdminProductPage = () => {
   const navigate = useNavigate();
@@ -54,13 +55,35 @@ const AdminProductPage = () => {
     navigate("?" + query);    
   }, [searchQuery]);
 
-  const deleteItem = (id) => {
-    //아이템 삭제하가ㅣ
+  const deleteItem = async  (id) => {
+    //아이템 삭제하기
+    if (!window.confirm("정말 삭제하시겠어요?")) return;
+
+    const action = await dispatch(deleteProduct(id));
+
+    // 성공/실패 분기
+    if (deleteProduct.fulfilled.match(action)) {
+    // 현재 페이지 마지막 1개를 지웠다면 페이지 한 칸 앞으로
+      if (productList.length === 1 && Number(searchQuery.page) > 1) {
+        setSearchQuery({ ...searchQuery, page: Number(searchQuery.page) - 1 });
+      } else {
+      // 현재 페이지 유지한 채로 새로고침 원하면:
+      dispatch(getProductList({ ...searchQuery }));
+      // 또는 page를 1로 리셋해서 보고 싶으면:
+      // setSearchQuery({ ...searchQuery, page: 1 });
+      }
+    } else {
+    // 실패 시 에러 토스트 등 처리 (action.payload에 메시지)
+      dispatch(showToastMessage({ message: action.payload || "삭제 실패", status: "error" }));
+    }
   };
 
   const openEditForm = (product) => {
-    //edit모드로 설정하고
-    // 아이템 수정다이얼로그 열어주기
+    // edit 모드로 설정하고
+    setMode("edit");
+    // 아이템 수정 다이얼로그 열어주기
+    dispatch(setSelectedProduct(product));
+    setShowDialog(true);
   };
 
   const handleClickNewItem = () => {

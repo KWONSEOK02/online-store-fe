@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect} from "react";
 import { Form, Modal, Button, Row, Col, Alert } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import CloudinaryUploadWidget from "../../../utils/CloudinaryUploadWidget";
@@ -26,16 +26,11 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
     (state) => state.product
   );
   const [formData, setFormData] = useState(
-    mode === "new" ? { ...InitialFormData } : selectedProduct
+    mode === "new" ? { ...InitialFormData } : selectedProduct // new면 초기form  기존 수정은 selectedProduct 가져옴
   );
   const [stock, setStock] = useState([]);
   const dispatch = useDispatch();
   const [stockError, setStockError] = useState(false);
-
-  useEffect(() => {
-      setShowDialog(false);
-      refreshList(); //리스트 새로고침
-  }, [success]);
 
   useEffect(() => {
     if (error || !success) {
@@ -63,26 +58,37 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // [["s", "3"],["m", "4"]] => {s:3, m:4}
     // 재고를 입력했는지 확인, 아니면 에러
-    if (stock.length === 0) return setStockError(true);
-
+    if (stock.length === 0) {
+      return setStockError(true);
+    }
+  
     // 재고를 배열에서 객체로 바꿔주기
     const totalStock = stock.reduce((total, item) => {
       return { ...total, [item[0]]: item[1] };
     }, {});
-
+  
     if (mode === "new") {
-      //새 상품 만들기
+      // 새 상품 만들기
       const result = await dispatch(createProduct({ ...formData, stock: totalStock }));
-
-      // ✅ 비동기 결과가 성공했는지 판별
+  
+      // 비동기 결과가 성공했는지 판별
       if (createProduct.fulfilled.match(result)) {
-        refreshList();        // ✅ 리스트 새로고침
-        setShowDialog(false); // ✅ 모달 닫기
+        refreshList();        // 리스트 새로고침
+        setShowDialog(false); // 모달 닫기
       }
     } else {
       // 상품 수정하기
+      const result = await dispatch(
+        editProduct({ ...formData, stock: totalStock, id: selectedProduct._id })
+      );
+  
+      // 비동기 결과가 성공했는지 판별
+      if (editProduct.fulfilled.match(result)) { 
+        // editProduct에서 dispatch(getProductList({page: 1}));로 갱신해서 
+        //refreshList() 필요 없음.  refreshList()를 여기에 넣으면 동작이 왜 안될까.
+        setShowDialog(false);
+      }
     }
   };
 

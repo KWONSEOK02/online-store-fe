@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../utils/api";
 import { showToastMessage } from "../common/uiSlice";
 
+
 // 비동기 액션 생성
 export const getProductList = createAsyncThunk(
   "products/getProductList",
@@ -13,8 +14,6 @@ export const getProductList = createAsyncThunk(
       
       // 결과 전체 넘기고, getProductList.fulfilled에서 최종 페이지와 data 저장
       return response.data; 
-      
-
     }catch(error){
       return rejectWithValue(error.error || "상품 목록 로딩 실패");
     }
@@ -44,12 +43,30 @@ export const createProduct = createAsyncThunk(
 
 export const deleteProduct = createAsyncThunk(
   "products/deleteProduct",
-  async (id, { dispatch, rejectWithValue }) => {}
+  async (id, { dispatch, rejectWithValue }) => {
+    try{
+      const response = await api.delete(`/product/${id}`);
+      if (response.status !== 200) throw new Error(response.data?.message || "삭제 실패");
+      dispatch(showToastMessage({ message: "상품 삭제 완료", status: "success" }));
+      dispatch(getProductList({ page: 1 })); // 목록 새로고침
+      return id; // 삭제 id 받기
+    }catch(error){
+      return rejectWithValue(error.message || "삭제 실패");
+    }
+  }
 );
 
 export const editProduct = createAsyncThunk(
   "products/editProduct",
-  async ({ id, ...formData }, { dispatch, rejectWithValue }) => {}
+  async ({ id, ...formData }, { dispatch, rejectWithValue }) => {
+    try{
+      const response = await api.put(`/product/${id}`, formData); // 백틱 사용 해야함 물결 모양 옆에 있는거  따옴표는 사용시 택스트로 인식
+      dispatch(getProductList({page: 1})); // 여기서 갱신함
+      return response.data.data;
+    }catch(error){
+        return rejectWithValue(error.message);
+    }
+  }
 );
 
 // 슬라이스 생성
@@ -101,8 +118,34 @@ const productSlice = createSlice({
     .addCase(getProductList.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
-    });
-    
+    })
+    .addCase(editProduct.pending, (state, action)=>{
+      state.loading = true;
+    })
+    .addCase(editProduct.fulfilled, (state, action)=>{
+      state.loading = false;
+      state.error = "";
+      state.success = true;
+      
+    })
+    .addCase(editProduct.rejected, (state, action)=>{
+      state.loading = false;
+      state.error = action.payload;
+      state.success = false;
+    })
+    .addCase(deleteProduct.pending, (state, action)=>{
+      state.loading = true;
+    })
+    .addCase(deleteProduct.fulfilled, (state, action)=>{
+      state.loading = false;
+      state.error = "";
+      state.success = true;
+    })
+    .addCase(deleteProduct.rejected, (state, action)=>{
+      state.loading = false;
+      state.error = action.payload;
+      state.success = false;
+    })
   },
 });
 
