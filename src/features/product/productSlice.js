@@ -41,14 +41,13 @@ export const createProduct = createAsyncThunk(
   }
 );
 
-export const deleteProduct = createAsyncThunk(
+export const deleteProduct = createAsyncThunk( //adminProductPage에서 현재 페이지로 갱신할 거라서 여기에 넣을 필요 없음.
   "products/deleteProduct",
   async (id, { dispatch, rejectWithValue }) => {
     try{
       const response = await api.delete(`/product/${id}`);
       if (response.status !== 200) throw new Error(response.data?.message || "삭제 실패");
       dispatch(showToastMessage({ message: "상품 삭제 완료", status: "success" }));
-      dispatch(getProductList({ page: 1 })); // 목록 새로고침
       return id; // 삭제 id 받기
     }catch(error){
       return rejectWithValue(error.message || "삭제 실패");
@@ -61,6 +60,8 @@ export const editProduct = createAsyncThunk(
   async ({ id, ...formData }, { dispatch, rejectWithValue }) => {
     try{
       const response = await api.put(`/product/${id}`, formData); // 백틱 사용 해야함 물결 모양 옆에 있는거  따옴표는 사용시 택스트로 인식
+      if (response.status !== 200) throw new Error(response.message);
+      dispatch(showToastMessage({ message: "상품 수정 완료", status: "success" }));
       dispatch(getProductList({page: 1})); // 여기서 갱신함
       return response.data.data;
     }catch(error){

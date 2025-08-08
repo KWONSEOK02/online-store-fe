@@ -126,7 +126,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
   };
 
   const onHandleCategory = (event) => {
-    // 카테코리가 이미 추가되어 있으면 제거거
+    // 카테코리가 이미 추가되어 있으면 제거
     if (formData.category.includes(event.target.value)) {
       const newCategory = formData.category.filter(
         (item) => item !== event.target.value
