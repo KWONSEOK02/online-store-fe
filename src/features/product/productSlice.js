@@ -22,7 +22,16 @@ export const getProductList = createAsyncThunk(
 
 export const getProductDetail = createAsyncThunk(
   "products/getProductDetail",
-  async (id, { rejectWithValue }) => {}
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/product/${id}`);
+      if (response.status !== 200) throw new Error(response.data?.message);
+
+      return response.data.data; 
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message || "상품 상세 로딩 실패");
+    }
+  }
 );
 
 export const createProduct = createAsyncThunk(
@@ -126,8 +135,7 @@ const productSlice = createSlice({
     .addCase(editProduct.fulfilled, (state, action)=>{
       state.loading = false;
       state.error = "";
-      state.success = true;
-      
+      state.success = true; 
     })
     .addCase(editProduct.rejected, (state, action)=>{
       state.loading = false;
@@ -146,6 +154,23 @@ const productSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
       state.success = false;
+    })
+    .addCase(getProductDetail.pending, (state, action)=>{
+      state.loading = true;
+      state.selectedProduct = null;   // 이전 상세 잔상 제거
+    })
+    .addCase(getProductDetail.fulfilled, (state, action)=>{
+      state.loading = false;
+      state.error = "";
+      state.success = true;
+      state.selectedProduct = action.payload;
+    // 백엔드 응답이 {data:{...}} 형태면 -> action.payload.data 로 변경
+    })
+    .addCase(getProductDetail.rejected, (state, action)=>{
+      state.loading = false;
+      state.error = action.payload;
+      state.success = false;
+      state.selectedProduct = null;   // 실패 시도 정리
     })
   },
 });

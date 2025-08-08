@@ -24,6 +24,8 @@ const ProductDetail = () => {
   };
   const selectSize = (value) => {
     // 사이즈 추가하기
+    setSize(value);          // 선택된 사이즈 상태 저장
+    setSizeError(false);     // 에러 메시지 숨김
   };
 
   useEffect(() => {
