@@ -17,7 +17,11 @@ export const addToCart = createAsyncThunk(
   async ({ id, size }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.post("/cart", { productId: id, size, qty: 1 });
-      if (response.status !== 200) throw new Error(response.error);
+       // 서버 응답에서 status 확인
+       if (response.data.status !== "success") {
+        throw new Error(response.data.error || "알 수 없는 오류");
+      }
+
       dispatch(
         showToastMessage({
           message: "카트에 아이템이 추가 됐습니다",
@@ -25,14 +29,17 @@ export const addToCart = createAsyncThunk(
         })
       );
       return response.data.cartItemQty;
+
     } catch (error) {
+      const errMsg = error?.error || "카트에 아이템 추가 실패"; // error?.error 백엔드에서 error로 보냄
       dispatch(
         showToastMessage({
-          message: "카트에 아이템 추가 실패",
+          message: errMsg,
           status: "error",
         })
       );
-      return rejectWithValue(error.message);
+  
+      return rejectWithValue(errMsg);
     }
   }
 );
