@@ -218,7 +218,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
                       handleSizeChange(event.target.value, index)
                     }
                     required
-                    defaultValue={item[0] ? item[0].toLowerCase() : ""}
+                    defaultValue={item[0] ? item[0].toUpperCase() : ""}
                   >
                     <option value="" disabled selected hidden>
                       Please Choose...
@@ -226,9 +226,9 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
                     {SIZE.map((item, index) => (
                       <option
                         inValid={true}
-                        value={item.toLowerCase()}
+                        value={item.toUpperCase()}
                         disabled={stock.some(
-                          (size) => size[0] === item.toLowerCase()
+                          (size) => size[0] === item.toUpperCase()
                         )}
                         key={index}
                       >
