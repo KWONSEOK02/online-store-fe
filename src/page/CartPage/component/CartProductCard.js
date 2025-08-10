@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useDispatch } from "react-redux";
 import { currencyFormat } from "../../../utils/number";
 import { updateQty, deleteCartItem } from "../../../features/cart/cartSlice";
+
 const CartProductCard = ({ item }) => {
   const dispatch = useDispatch();
 
