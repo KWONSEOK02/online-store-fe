@@ -2,13 +2,14 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import { showToastMessage } from "../common/uiSlice";
 import api from "../../utils/api";
-import { initialCart } from "../cart/cartSlice";
+import { initialCart, getCartQty } from "../cart/cartSlice";
 
 export const loginWithEmail = createAsyncThunk( // 로그인 시 토큰 세션 스토리지에 저장
   "user/loginWithEmail",
   async ({ email, password }, { rejectWithValue }) => {
     try{
       const response = await api.post("/auth/login", {email, password});
+
       return response.data; // response.data.user 도 가능
     } catch(error){
         return rejectWithValue(error.message); // error.message 백엔드의 오류 메시지 받아서 출력 
@@ -22,6 +23,7 @@ export const loginWithGoogle = createAsyncThunk(
 );
 
 export const logout = () => (dispatch) => {
+  dispatch(initialCart());     // 프론트 카운트 0으로
   sessionStorage.removeItem("token"); // 토큰 삭제
   window.location.href = "/login"; // 로그인 페이지로 강제 이동 (새로고침 포함)
 };

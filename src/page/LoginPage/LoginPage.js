@@ -7,7 +7,12 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import "./style/login.style.css";
 import { loginWithEmail, loginWithGoogle } from "../../features/user/userSlice";
 import { clearErrors } from "../../features/user/userSlice";
+
+import api from "../../utils/api";
+import { getCartQty} from "../../features/cart/cartSlice";
+
 const GOOGLE_CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -35,10 +40,14 @@ const Login = () => {
   
       sessionStorage.setItem("token", token);
   
-      // api 인스턴스가 별도로 정의되어 있다면 import 해야 함
-      import("../../utils/api").then(({ default: api }) => {
-        api.defaults.headers["authorization"] = "Bearer " + token;
-      });
+      // import("../../utils/api").then(({ default: api }) => {
+      //   api.defaults.headers["authorization"] = "Bearer " + token;
+      // });
+
+       // 2) 헤더 세팅 (동적 import 삭제, 정적 import 사용)
+      api.defaults.headers.authorization = `Bearer ${token}`;
+
+      await dispatch(getCartQty());
   
     } else {
       // 오류 메시지는 Redux store의 loginError를 통해 Alert로 표시됨
