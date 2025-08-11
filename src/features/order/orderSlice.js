@@ -16,8 +16,22 @@ const initialState = {
 // Async thunks
 export const createOrder = createAsyncThunk(
   "order/createOrder",
-  async (payload, { dispatch, rejectWithValue }) => {}
+  async (payload, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.post("/order", payload);
+      
+      if (response.data.status !== "success") {
+        throw new Error(response.data.error || "주문 생성 실패");
+      }
+
+      return response.data.orderNum;
+    } catch (error) {
+      dispatch(showToastMessage({ message: error.message, status: "error" }));
+      return rejectWithValue(error.message);
+    }
+  }
 );
+
 
 export const getOrder = createAsyncThunk(
   "order/getOrder",
@@ -43,7 +57,20 @@ const orderSlice = createSlice({
       state.selectedOrder = action.payload;
     },
   },
-  extraReducers: (builder) => {},
+  extraReducers: (builder) => {
+    builder.addCase(createOrder.pending, (state, action) => {
+      state.loading = true;
+    })
+    .addCase(createOrder.fulfilled, (state, action) => {
+      state.loading = false;
+      state.error = "";
+      state.orderNum = action.payload; //리턴 값 저장
+    })
+    .addCase(createOrder.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });    
+  },
 });
 
 export const { setSelectedOrder } = orderSlice.actions;
