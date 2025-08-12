@@ -104,6 +104,7 @@ export const getCartQty = createAsyncThunk(
 
       return response.data.qty; // fulfilled → extraReducers에서 state.cartItemCount 갱신
     } catch (error) {
+      dispatch(showToastMessage({message: error, status:"error"})); //
       return rejectWithValue(error.response?.data?.error || error.message);
     }
   }

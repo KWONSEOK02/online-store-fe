@@ -23,11 +23,18 @@ export const createOrder = createAsyncThunk(
       if (response.data.status !== "success") {
         throw new Error(response.data.error || "주문 생성 실패");
       }
+      dispatch(getCartQty());
 
       return response.data.orderNum;
     } catch (error) {
-      dispatch(showToastMessage({ message: error.message, status: "error" }));
-      return rejectWithValue(error.message);
+      const msg = error?.response?.data?.error ||   // Axios Error (기본형)
+      error?.response?.data?.message || // 혹시 message로 내려올 때
+      error?.error ||                   // 인터셉터가 data만 reject했을 때 { status, error }
+      error?.message ||                 // 일반 Error
+      "주문 생성 중 오류가 발생했습니다.";
+
+      dispatch(showToastMessage({ message: msg, status: "error" }));
+      return rejectWithValue(msg);
     }
   }
 );
