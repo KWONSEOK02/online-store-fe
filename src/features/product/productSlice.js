@@ -10,7 +10,7 @@ export const getProductList = createAsyncThunk(
     try{
       //검색 조건을 포함한 쿼리 파라미터를 백엔드에 전달하여, 필터링된 상품 목록을 받아오는 구조
       const response = await api.get("/product", {params:{...query}});
-      if (response.status !== 200) throw new Error(response.error);
+      //if (response.status !== 200) throw new Error(response.error);
       
       // 결과 전체 넘기고, getProductList.fulfilled에서 최종 페이지와 data 저장
       return response.data; 
@@ -25,7 +25,7 @@ export const getProductDetail = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await api.get(`/product/${id}`);
-      if (response.status !== 200) throw new Error(response.data?.message);
+      //if (response.status !== 200) throw new Error(response.data?.message);
 
       return response.data.data; 
     } catch (error) {
@@ -41,7 +41,7 @@ export const createProduct = createAsyncThunk(
       const response = await api.post("/product", formData);
       //error로 받으면 "Product validation failed: sku:" 같은 불필요한 앞부분이 붙는 문제
       //error -> message로 수정
-      if (response.status !== 200) throw new Error(response.message);  
+      //if (response.status !== 200) throw new Error(response.message);  
       dispatch(showToastMessage({ message: "상품 생성 완료", status: "success" }));
       return response.data.data;
     } catch (error) {
@@ -55,7 +55,7 @@ export const deleteProduct = createAsyncThunk( //adminProductPage에서 현재 �
   async (id, { dispatch, rejectWithValue }) => {
     try{
       const response = await api.delete(`/product/${id}`);
-      if (response.status !== 200) throw new Error(response.data?.message || "삭제 실패");
+      //if (response.status !== 200) throw new Error(response.data?.message || "삭제 실패");
       dispatch(showToastMessage({ message: "상품 삭제 완료", status: "success" }));
       return id; // 삭제 id 받기
     }catch(error){
@@ -69,7 +69,7 @@ export const editProduct = createAsyncThunk(
   async ({ id, ...formData }, { dispatch, rejectWithValue }) => {
     try{
       const response = await api.put(`/product/${id}`, formData); // 백틱 사용 해야함 물결 모양 옆에 있는거  따옴표는 사용시 택스트로 인식
-      if (response.status !== 200) throw new Error(response.message);
+      //if (response.status !== 200) throw new Error(response.message);
       dispatch(showToastMessage({ message: "상품 수정 완료", status: "success" }));
       dispatch(getProductList({page: 1})); // 여기서 갱신함
       return response.data.data;
