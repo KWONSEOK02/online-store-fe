@@ -32,9 +32,8 @@ const PaymentPage = () => {
 
 
   useEffect(() => {
-    // 오더번호를 받으면 어디로 갈까?
     if(firstLoading){
-      // useEffect가 처음에 호출될 때 오더 성공페이지로 넘어가는걸 막기 위해해
+     // 첫 렌더에서 성공 페이지로 오작동 리다이렉트되는 것 방지
       setFirstLoading(false);
     }else{
       if(orderNum !== ""){
@@ -45,7 +44,6 @@ const PaymentPage = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // 오더 생성하기
     const {firstName, lastName, contact, address, city, zip} = shipInfo;
     dispatch(
       createOrder({
@@ -65,15 +63,14 @@ const PaymentPage = () => {
   };
 
   const handleFormChange = (event) => {
-    //shipInfo에 값 넣어주기
     const { name, value } = event.target;
     setShipInfo({ ...shipInfo, [name]: value });
   };
 
   const handlePaymentInfoChange = (event) => {
-    //카드정보 넣어주기
     const { name, value } = event.target;
-    if (name === "expiry") { // "expiry"는 카드 유효기간 필드의 name 속성 값
+    if (name === "expiry") {
+      // expiry는 MM/YY로 포맷
       let newValue = cc_expires_format(value);
       setCardValue({ ...cardValue, [name]: newValue });
       return;
@@ -87,7 +84,7 @@ const PaymentPage = () => {
   };
   if (cartList?.length === 0) {
     navigate("/cart");
-  }// 주문할 아이템이 없다면 주문하기로 안넘어가게 막음
+  }
   return (
     <Container>
       <Row>

@@ -3,7 +3,6 @@ import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 import { currencyFormat } from "../../../utils/number";
 
-// initialLoading props 추가
 const ProductTable = ({ header, data, deleteItem, openEditForm, searchKeyword, initialLoading }) => {
   return (
     <div className="overflow-x">

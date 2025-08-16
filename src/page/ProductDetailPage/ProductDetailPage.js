@@ -20,40 +20,29 @@ const ProductDetail = () => {
   const [sizeError, setSizeError] = useState(false);
   
  
-
+// Add-to-cart UX: (1) 사이즈 미선택 시 경고 후 중단 (2) 미로그인 시 로그인으로 이동
   const addItemToCart = () => {
-    //사이즈를 아직 선택안했다면 에러
     if (size === "") {
       setSizeError(true);
       return;
     }
   
-    // 아직 로그인을 안한유저라면 로그인페이지로
     if(!user){
       navigate("/login");
-      return;   // 로그인 이동 후  addItemToCart 빠져나옴
+      return;
     } 
 
-    // 카트에 아이템 추가하기
+    
     dispatch(addToCart({id, size}));
   };
   const selectSize = (value) => {
-    // 사이즈 추가하기
-    if(sizeError) setSizeError(false);     // 에러 메시지 숨김
-    setSize(value);          // 선택된 사이즈 상태 저장
+    if(sizeError) setSizeError(false);    
+    setSize(value);         
   };
 
   useEffect(() => {
     if (id) dispatch(getProductDetail(id));
   }, [id, dispatch]);
-
-// if (loading) {
-//   return (
-//     <div className="center-wrapper">
-//       <ColorRing visible height="80" width="80" ariaLabel="blocks-loading" />
-//     </div>
-//   );
-// }
 
 if (loading) {
   return (
@@ -69,7 +58,6 @@ if (loading) {
   );
 }
 
-// 에러
 if (error) {
   return (
     <div className="center-wrapper warning-message">
@@ -81,7 +69,7 @@ if (error) {
 if (!selectedProduct) {
   return <div className="warning-message">상품을 불러오지 못했습니다.</div>;
 }
-// -----------------------------
+
 
 const stock = selectedProduct.stock || {};
 
@@ -135,6 +123,6 @@ return (
   </Container>
 );
 
-}; // ProductDetail 닫는 중괄호
+};
 
 export default ProductDetail;

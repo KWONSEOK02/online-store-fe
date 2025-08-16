@@ -3,7 +3,6 @@ import { getCartQty } from "../cart/cartSlice";
 import api from "../../utils/api";
 import { showToastMessage } from "../common/uiSlice";
 
-// Define initial state
 const initialState = {
   orderList: [],
   orderNum: "",
@@ -20,17 +19,14 @@ export const createOrder = createAsyncThunk(
     try {
       const response = await api.post("/order", payload);
       
-      if (response.data.status !== "success") {
-        throw new Error(response.data.error || "주문 생성 실패");
-      }
       dispatch(getCartQty());
 
       return response.data.orderNum;
     } catch (error) {
-      const msg = error?.response?.data?.error ||   // Axios Error (기본형)
-      error?.response?.data?.message || // 혹시 message로 내려올 때
-      error?.error ||                   // 인터셉터가 data만 reject했을 때 { status, error }
-      error?.message ||                 // 일반 Error
+      const msg = error?.response?.data?.error ||
+      error?.response?.data?.message || 
+      error?.error ||                   
+      error?.message ||                 
       "주문 생성 중 오류가 발생했습니다.";
 
       dispatch(showToastMessage({ message: msg, status: "error" }));
@@ -77,7 +73,7 @@ export const updateOrder = createAsyncThunk(
       const response = await api.put("/order", { id, status });
      
       dispatch(showToastMessage({ message: "주문 상태 수정 완료", status: "success" }));
-      dispatch(getOrderList({page: 1})); // 여기서 갱신함
+      dispatch(getOrderList({page: 1}));
       return response.data.data;
     }catch(error){
         return rejectWithValue(error.message);
@@ -101,7 +97,7 @@ const orderSlice = createSlice({
     .addCase(createOrder.fulfilled, (state, action) => {
       state.loading = false;
       state.error = "";
-      state.orderNum = action.payload; //리턴 값 저장
+      state.orderNum = action.payload; 
     })
     .addCase(createOrder.rejected, (state, action) => {
       state.loading = false;
@@ -114,7 +110,7 @@ const orderSlice = createSlice({
       state.loading = false;
       state.orderList = action.payload.data;
       state.error = "";
-      state.totalPageNum = action.payload.totalPageNum; // 전체 페이지 수 상태에 저장
+      state.totalPageNum = action.payload.totalPageNum; 
     })
     .addCase(getOrderList.rejected, (state, action) => {
       state.loading = false;

@@ -3,7 +3,7 @@ import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router";
 import { useLocation } from "react-router-dom";
 import { currencyFormat } from "../../../utils/number";
-//currencyFormat  숫자를 통화 형식으로 변환해 주는 유틸리티 함수
+
 const OrderReceipt = ({cartList, totalPrice}) => {
   const location = useLocation();
   const navigate = useNavigate();

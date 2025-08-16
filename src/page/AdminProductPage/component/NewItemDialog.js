@@ -13,7 +13,7 @@ import {
 const InitialFormData = {
   name: "",
   sku: "",
-  stock: {},  // 밑에서 배열로 저장한 stock를 객체 형식으로 변환해야함
+  stock: {},  
   image: "",
   description: "",
   category: [],
@@ -26,12 +26,13 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
     (state) => state.product
   );
   const [formData, setFormData] = useState(
-    mode === "new" ? { ...InitialFormData } : selectedProduct // new면 초기form  기존 수정은 selectedProduct 가져옴
+    mode === "new" ? { ...InitialFormData } : selectedProduct 
   );
   const [stock, setStock] = useState([]);
   const dispatch = useDispatch();
   const [stockError, setStockError] = useState(false);
-
+ 
+  // 모달 열릴 때 편집 모드라면 stock(Object) → [size, qty][]로 변환해 폼에 바인딩
   useEffect(() => {
     if (error || !success) {
       dispatch(clearError());
@@ -39,79 +40,65 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
     if (showDialog) {
       if (mode === "edit") {
         setFormData(selectedProduct);
-        // 객체형태로 온 stock을  다시 배열로 세팅해주기
         const sizeArray = Object.keys(selectedProduct.stock).map((size) => [
           size,
           selectedProduct.stock[size],
         ]);
         setStock(sizeArray);
       } else {
-        setFormData({ ...InitialFormData });   // 이미 여기서 초기화됨
-        setStock([]); // 이미 여기서 초기화함
+        setFormData({ ...InitialFormData });  
+        setStock([]); 
       }
     }
   }, [showDialog]);
 
-  const handleClose = () => { // 창 닫을 떄 위에서 초기화 하므로 초기화 할 필요 없다.
+  const handleClose = () => { 
     setShowDialog(false);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // 재고를 입력했는지 확인, 아니면 에러
     if (stock.length === 0) {
       return setStockError(true);
     }
   
-    // 재고를 배열에서 객체로 바꿔주기
     const totalStock = stock.reduce((total, item) => {
       return { ...total, [item[0]]: item[1] };
     }, {});
   
     if (mode === "new") {
-      // 새 상품 만들기
       const result = await dispatch(createProduct({ ...formData, stock: totalStock }));
   
-      // 비동기 결과가 성공했는지 판별
       if (createProduct.fulfilled.match(result)) {
-        refreshList();        // 리스트 새로고침
-        setShowDialog(false); // 모달 닫기
+        refreshList();        
+        setShowDialog(false); 
       }
     } else {
-      // 상품 수정하기
       const result = await dispatch(
         editProduct({ ...formData, stock: totalStock, id: selectedProduct._id })
       );
   
-      // 비동기 결과가 성공했는지 판별
       if (editProduct.fulfilled.match(result)) { 
-        // editProduct에서 dispatch(getProductList({page: 1}));로 갱신해서 
-        //refreshList() 필요 없음.  refreshList()를 여기에 넣으면 동작이 왜 안될까.
         setShowDialog(false);
       }
     }
   };
-
+  // Create/Edit 상품 모달: stock을 [size, qty] 페어 배열로 다루고 제출 시 객체로 변환
   const handleChange = (event) => {
-    //form에 데이터 넣어주기
     const { id, value } = event.target;
     setFormData({ ...formData, [id]: value });
   };
 
   const addStock = () => {
-    //재고타입 추가시 배열에 새 배열 추가
     setStock([ ...stock, [] ]);
   };
 
   const deleteStock = (idx) => {
-    //재고 삭제하기
-    // 특정 인덱스(idx)에 해당하지 않는 요소만 필터링하여 새로운 배열 생성
     const newStock = stock.filter((item, index) => index !== idx);
     setStock(newStock);
   };
 
   const handleSizeChange = (value, index) => {
-    //  재고 사이즈 변환하기
     const newStock = [...stock];
     newStock[index][0] = value;
     setStock(newStock);
@@ -119,14 +106,12 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
   };
 
   const handleStockChange = (value, index) => {
-    //재고 수량 변환하기
     const newStock = [...stock];
     newStock[index][1] = value;
     setStock(newStock);
   };
 
   const onHandleCategory = (event) => {
-    // 카테코리가 이미 추가되어 있으면 제거
     if (formData.category.includes(event.target.value)) {
       const newCategory = formData.category.filter(
         (item) => item !== event.target.value
@@ -136,7 +121,6 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
         category: [...newCategory],
       });
     } else {
-      // 아니면 새로 추가
       setFormData({
         ...formData,
         category: [...formData.category, event.target.value],
@@ -145,7 +129,6 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
   };
 
   const uploadImage = (url) => {
-    //이미지 업로드
     setFormData({ ...formData, image: url });
   };
 

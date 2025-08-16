@@ -21,47 +21,42 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+
   useEffect(() => {
     if (loginError) {
       dispatch(clearErrors());
     }
     if (user) {
-      navigate("/"); // user가 로그인되었으면 리디렉션
+      navigate("/"); 
     }
   }, [user, navigate]);
-
+// 로그인 성공 시 토큰을 세션에 저장하고 Axios 기본 Authorization 헤더를 설정
   const handleLoginWithEmail = async (event) => {
     event.preventDefault();
 
     const result = await dispatch(loginWithEmail({ email, password }));
   
     if (loginWithEmail.fulfilled.match(result)) {
-      const { user, token } = result.payload; // user를 나중에 사용할 것인가?
+      const { token } = result.payload; 
   
       sessionStorage.setItem("token", token);
   
-      // import("../../utils/api").then(({ default: api }) => {
-      //   api.defaults.headers["authorization"] = "Bearer " + token;
-      // });
-
-       // 2) 헤더 세팅 (동적 import 삭제, 정적 import 사용)
       api.defaults.headers.authorization = `Bearer ${token}`;
 
       await dispatch(getCartQty());
   
     } else {
-      // 오류 메시지는 Redux store의 loginError를 통해 Alert로 표시됨
       console.error("Login failed:", result.payload);
     }
   };
 
   const handleGoogleLogin = async (googleData) => {
-    //구글 로그인 하기
+   
     dispatch(loginWithGoogle(googleData.credential));
   };
 
   if (user) {
-    navigate("/"); //  이미 로그인된 유저가 로그인 페이지에 접근하면 메인
+    navigate("/"); 
   }
   return (
     <>
