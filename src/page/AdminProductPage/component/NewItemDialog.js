@@ -79,6 +79,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
       );
   
       if (editProduct.fulfilled.match(result)) { 
+        refreshList();
         setShowDialog(false);
       }
     }

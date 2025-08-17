@@ -38,12 +38,15 @@ const AdminProductPage = () => {
     "",
   ];
 
-  // URL 쿼리(페이지/검색어)에 맞춰 목록 요청
+  // URL 쿼리에 맞춰 목록 요청 & 버튼 동기화
   useEffect(() => {
-    dispatch(getProductList({ ...searchQuery })).finally(() => {
-      setInitialLoading(false); 
-    });
-  }, [query]);
+    const pageFromUrl = Number(query.get("page") || 1);
+    const nameFromUrl = query.get("name") || "";
+    setSearchQuery((prev) => ({ ...prev, page: pageFromUrl, name: nameFromUrl }));
+
+    dispatch(getProductList({ page: pageFromUrl, name: nameFromUrl }))
+      .finally(() => setInitialLoading(false));
+  }, [dispatch, query]);
   
   useEffect(() => {
     // searchQuery 변경 시 URL 동기화
@@ -85,7 +88,7 @@ const AdminProductPage = () => {
   };
 
   const refreshList = () => {
-    setSearchQuery({ ...searchQuery, page: 1 }); 
+    setSearchQuery((prev) => ({ ...prev, page: 1 }));
   };  
 
   const handlePageClick = ({ selected }) => {
@@ -121,7 +124,7 @@ const AdminProductPage = () => {
           onPageChange={handlePageClick}
           pageRangeDisplayed={5}
           pageCount={totalPageNum}
-          forcePage={searchQuery.page - 1}
+          forcePage={Number(searchQuery.page) - 1}
           previousLabel="< previous"
           renderOnZeroPageCount={null}
           pageClassName="page-item"
