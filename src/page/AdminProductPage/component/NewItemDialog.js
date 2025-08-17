@@ -52,7 +52,8 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog, refreshList}) => {
     }
   }, [showDialog]);
 
-  const handleClose = () => { 
+  const handleClose = () => {
+    setStockError(false); 
     setShowDialog(false);
   };
 
