@@ -77,6 +77,15 @@ return (
   <Container className="product-detail-card">
     <Row>
       <Col sm={6}>
+      <Button
+        variant="outline-secondary"
+        size="sm"
+        className="mb-2 py-1 px-2"
+        onClick={() => navigate("/")}
+        aria-label="Go to Home"
+      >
+    ← Home
+  </Button>
         <img src={selectedProduct.image} className="w-100" alt="product" />
       </Col>
 
