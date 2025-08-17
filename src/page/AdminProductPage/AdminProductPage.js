@@ -107,10 +107,19 @@ const AdminProductPage = () => {
             field="name"
           />
         </div>
-        <Button className="mt-2 mb-2" onClick={handleClickNewItem}>
-          Add New Item +
-        </Button>
 
+        <div className="d-flex gap-2 mt-2 mb-2">
+          <Button
+            variant="outline-secondary"
+            onClick={() => navigate("/")}
+            aria-label="Go to Home"
+          >
+            ← Home
+          </Button>
+          <Button className="mt-2 mb-2" onClick={handleClickNewItem}>
+            Add New Item +
+          </Button>
+        </div>
         <ProductTable
           header={tableHeader}
           data={productList}
